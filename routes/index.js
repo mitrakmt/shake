@@ -12,7 +12,6 @@ router.get('/status', (req, res) => {
     });
 });
 
-
 router.use('/auth', authRoute); //add routes
 router.use('/user', userRoute)
 
