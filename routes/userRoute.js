@@ -14,6 +14,11 @@ const router = express.Router();
     trimRequest.all,
     isActiveUser,
     controller.getUserInfo
+  )
+  .put(
+    trimRequest.all,
+    isActiveUser,
+    controller.updateUserInfo
   );
 
 export default router;
