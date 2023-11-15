@@ -8,7 +8,8 @@
   const createNewUser = async(user)=>{
     const oldUser =await UserModel.findOne({ email:user.email.toLowerCase() });
     if(oldUser)
-      throw new APIError(httpStatus.BAD_REQUEST,"Email already exists.")
+      throw new APIError(httpStatus.BAD_REQUEST, "Email already exists.")
+    
     const newUser = await UserModel.create(user);
     if(!newUser)
       throw new APIError(httpStatus.BAD_REQUEST,"Oops...seems our server needed a break!")
@@ -16,10 +17,10 @@
   }
 
   const createNewGoogleUser = async({ id, email, firstName, lastName, profilePhoto }) => {
-    const oldUser =await UserModel.findOne({ email: email.toLowerCase() });
+    const oldUser =await UserModel.findOne({ email: email.toLowerCase(), name: `${firstName} ${lastName}`, profilePhoto });
     if(oldUser)
       throw new APIError(httpStatus.BAD_REQUEST,"Email already exists.")
-    const newUser = await UserModel.create({email, source: "google"});
+    const newUser = await UserModel.create({email, source: "google", lastLogin: Date.now(), accountStatus: "active"});
     if(!newUser)
       throw new APIError(httpStatus.BAD_REQUEST,"Oops...seems our server needed a break!")
     return newUser;
@@ -38,9 +39,16 @@
   
     if (!passwordMatches)
       throw new APIError(httpStatus.BAD_REQUEST, 'invalid credentials');
+
+    // Update user accountStats and lastLogin
+    UserModel.findByIdAndUpdate(user._id, {
+      accountStatus : "active",
+      lastLogin : Date.now()
+    })
   
     return user;
   };
+
   const fetchUserFromEmail= async ({ email }) => {
     const user = await UserModel.findOne({
       email: email.toLowerCase(),
@@ -103,8 +111,6 @@
     );
 
   };
-
-  
 
   export {
     fetchUserFromEmailAndPassword,

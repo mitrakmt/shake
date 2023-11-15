@@ -17,13 +17,14 @@ import { OAuth2Client } from 'google-auth-library';
 
    
   const register = async (req, res, next) => {
-    const {email, password} = req.body
+    const {email, password, username} = req.body
     try {
     const hashedPassword = await bcryptjs.hash(password, 10);
     const newUser = await createNewUser({
       email : email,
       password : hashedPassword,
-      source : "email"
+      source: "email",
+      username : username
     });
     const tokens = await generateAuthTokens(newUser)
     res.json({user : newUser,tokens});
@@ -102,7 +103,6 @@ import { OAuth2Client } from 'google-auth-library';
   }
   const googleUserLogin = async (req, res, next) => {
     try {
-      console.log("dd")
       const { token }  = req.body
       const ticket = await client.verifyIdToken({
           idToken: token,
@@ -118,5 +118,5 @@ import { OAuth2Client } from 'google-auth-library';
   }
 
 export default { 
-  login, logout, refreshToken,  resetPassword, register,googleUserRegister,googleUserLogin
+  login, logout, refreshToken,  resetPassword, register, googleUserRegister, googleUserLogin
 }

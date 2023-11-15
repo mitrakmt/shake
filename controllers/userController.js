@@ -1,16 +1,26 @@
+import { sendPasswordResetEmail } from '../utils/emailFunctions.js';
 import {
-  getUserFromId
+  getUserFromId, updateUserById, getPublicUserById
 } from '../services/userService.js';
   
 const getUserInfo = async (req, res, next) => {
     const userId = req.authData.userId
     try {
         const user = await getUserFromId(userId)
-        const responseUser = {
-            id : user._id,
-            email : user.email,
-        } 
-        res.json({user : responseUser});
+
+        res.json({ user });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getPublicUser = async (req, res, next) => {
+    const userId = req.params.userId
+
+    try {
+        const user = await getPublicUserById(userId)
+
+        res.json({user});
     } catch (error) {
         next(error);
     }
@@ -18,14 +28,10 @@ const getUserInfo = async (req, res, next) => {
 
 const updateUserInfo = async (req, res, next) => {
     const userId = req.authData.userId
-    try {
-        const user = await getUserFromId(userId)
-        const responseUser = {
-            id : user._id,
-            email : user.email,
-        } 
+    const userDataToUpdate = req.body;
 
-        //TODO: update user in responseUser
+    try {
+        const responseUser = await updateUserById(userId, userDataToUpdate)
         
         res.json({
             user: responseUser
@@ -34,8 +40,24 @@ const updateUserInfo = async (req, res, next) => {
         next(error);
     }
 }
+
+
+const requestPasswordReset = async (req, res, next) => {
+    const userEmail = req.body.email;
+    // Generate a password reset token
+    const resetToken = 'generatedToken'; // Implement token generation logic
+
+    try {
+        await sendPasswordResetEmail(userEmail, resetToken);
+        res.status(200).json({ message: 'Password reset email sent.' });
+    } catch (error) {
+        next(error);
+    }
+};
  
 export default { 
     getUserInfo,
-    updateUserInfo
+    updateUserInfo,
+    getPublicUser,
+    requestPasswordReset
 }

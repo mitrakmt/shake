@@ -21,4 +21,11 @@ const router = express.Router();
     controller.updateUserInfo
   );
 
+router
+  .route('/:userId')
+  .get(
+    trimRequest.all,
+    controller.getPublicUser
+  )
+
 export default router;

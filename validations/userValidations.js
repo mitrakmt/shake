@@ -5,6 +5,12 @@ const schemas = {
     access: yup.object({
       userId: yup.string().required(),
     }),
+    name: yup.string(),
+    bio: yup.string(),
+    country: yup.string(),
+    city: yup.string(),
+    username: yup.string(),
+    gender: yup.string(),
   }),
 };
 

@@ -1,6 +1,7 @@
 import express from 'express';
 import authRoute from './authRoute.js';
 import userRoute from './userRoute.js';
+import businessCardRoute from './businessCardRoute.js';
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.get('/status', (req, res) => {
 
 router.use('/auth', authRoute); //add routes
 router.use('/user', userRoute)
+router.use('/business-card', businessCardRoute);
 
 export default router;
