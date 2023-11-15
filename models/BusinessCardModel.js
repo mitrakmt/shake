@@ -11,6 +11,7 @@ const businessCardSchema = new Schema({
     linkedin: String,
     twitter: String,
     instagram: String,
+    qrCode: String,
     industry: String,
 });
 

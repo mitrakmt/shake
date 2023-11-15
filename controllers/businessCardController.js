@@ -109,6 +109,28 @@ const shareBusinessCardByEmail = async (req, res, next) => {
     }
 };
 
+const shareBusinessCardBySms = async (req, res, next) => {
+    const userId = req.authData.userId; // Assuming you have the user's ID from auth middleware
+    const { cardId, recipientPhoneNumber } = req.body;
+
+    try {
+        const businessCard = await getBusinessCardById(cardId);
+
+        // Optional: Check if the business card belongs to the current user
+        if (businessCard.userId.toString() !== userId) {
+            return res.status(403).json({ message: 'You can only share your own business cards.' });
+        }
+
+        // Prepare the business card details for SMS
+        const cardDetails = `Business Card: ${businessCard.title}\nCompany: ${businessCard.company}\nContact: ${businessCard.email} / ${businessCard.phone}`;
+
+        await sendSMS(recipientPhoneNumber, cardDetails);
+        res.status(200).json({ message: 'Business card shared successfully via SMS.' });
+    } catch (error) {
+        next(error);
+    }
+};
+
 const fetchSharedCardsByCurrentUser = async (req, res, next) => {
     const userId = req.authData.userId; // Assuming the user's ID is stored in req.authData
 
@@ -120,6 +142,8 @@ const fetchSharedCardsByCurrentUser = async (req, res, next) => {
     }
 };
 
+
+
 export default {
     createCard,
     getCard,
@@ -129,5 +153,6 @@ export default {
     shareCard,
     getSharedCards,
     shareBusinessCardByEmail,
-    fetchSharedCardsByCurrentUser
+    fetchSharedCardsByCurrentUser,
+    shareBusinessCardBySms
 };

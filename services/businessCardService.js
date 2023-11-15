@@ -1,14 +1,31 @@
 import { BusinessCardModel, ConnectionModel } from '../models/index.js';
 import ApiError from '../utils/ApiError.js';
+import QRCode from 'qrcode';
 
 const createBusinessCard = async (cardData) => {
     try {
         const businessCard = new BusinessCardModel(cardData);
+
+        // Generate QR code
+        const qrCodeUrl = await generateQRCode(`https://www.api.getshake.io/v1/business-card/${businessCard._id}`);
+        businessCard.qrCode = qrCodeUrl;
+
         await businessCard.save();
         return businessCard;
     } catch (error) {
         console.error('Error creating business card:', error);
         throw new ApiError(error.message);
+    }
+};
+
+const generateQRCode = async (text) => {
+    try {
+        // Generate QR code with the text provided
+        const qrCodeData = await QRCode.toDataURL(text);
+        return qrCodeData;
+    } catch (error) {
+        console.error('Error generating QR code:', error);
+        throw error;
     }
 };
 

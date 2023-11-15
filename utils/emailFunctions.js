@@ -1,5 +1,30 @@
 // emailFunctions.js
-import { sendEmail } from '../services/emailService.js';
+import sgMail from '@sendgrid/mail';
+
+// Set your SendGrid API key
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+sgMail.setApiKey(SENDGRID_API_KEY);
+
+const sendEmail = async (to, subject, text, html) => {
+    const msg = {
+        to: to, // Change to your recipient
+        from: 'noreply@getshake.io', // Change to your verified sender
+        subject: subject,
+        text: text,
+        html: html,
+    };
+
+    try {
+        await sgMail.send(msg);
+        console.log('Email sent successfully');
+    } catch (error) {
+        console.error('Error sending email:', error);
+        if (error.response) {
+            console.error(error.response.body);
+        }
+        throw error;
+    }
+};
 
 const sendPasswordResetEmail = async (userEmail, resetToken) => {
     const subject = 'Password Reset';

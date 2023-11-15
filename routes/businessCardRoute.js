@@ -36,6 +36,14 @@ router
 )
 
 router
+    .route('/share/sms')
+        .post(
+            trimRequest.all,
+            isActiveUser,
+            controller.shareBusinessCardBySms
+)
+
+router
     .route('/shared')
         .get(
             trimRequest.all,
