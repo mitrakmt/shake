@@ -3,6 +3,7 @@ import authRoute from './authRoute.js';
 import userRoute from './userRoute.js';
 import businessCardRoute from './businessCardRoute.js';
 import templateRoute from './templateRoute.js';
+import analyticsRoute from './analyticsRoute.js';
 
 const router = express.Router();
 
@@ -18,5 +19,6 @@ router.use('/auth', authRoute); //add routes
 router.use('/user', userRoute)
 router.use('/business-card', businessCardRoute);
 router.use('/templates', templateRoute);
+router.use('/analytics', analyticsRoute);
 
 export default router;
