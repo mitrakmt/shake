@@ -7,6 +7,9 @@ import {
     shareBusinessCardWithUser,
     getSharedBusinessCards,
     getCardsSharedByUser,
+    updateConnectionNotes,
+    getCardsBySearch,
+    updateCardCategoryAndTags
 } from '../services/businessCardService.js';
 import { sendBusinessCardEmail } from '../utils/emailFunctions.js';
 
@@ -142,7 +145,51 @@ const fetchSharedCardsByCurrentUser = async (req, res, next) => {
     }
 };
 
+const searchBusinessCards = async (req, res) => {
+    try {
+        const { query, category, tags } = req.query;
+        let searchCriteria = {};
 
+        if (query) {
+            searchCriteria.$text = { $search: query };
+        }
+        if (category) {
+            searchCriteria.category = category;
+        }
+        if (tags) {
+            searchCriteria.tags = { $in: tags.split(',') };
+        }
+
+        const cards = await getCardsBySearch(searchCriteria);
+        res.json(cards);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
+const updateCategoryAndTags = async (req, res) => {
+    const { connectionId } = req.params;
+    const { category, tags } = req.body;
+
+    try {
+        const updatedCard = await updateCardCategoryAndTags(connectionId, category, tags);
+        res.json(updatedCard);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
+
+const editConnectionNotes = async (req, res) => {
+    const { connectionId } = req.params;
+    const { notes } = req.body;
+
+    try {
+        const updatedConnection = await updateConnectionNotes(connectionId, notes);
+        res.json(updatedConnection);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+};
 
 export default {
     createCard,
@@ -154,5 +201,8 @@ export default {
     getSharedCards,
     shareBusinessCardByEmail,
     fetchSharedCardsByCurrentUser,
-    shareBusinessCardBySms
+    shareBusinessCardBySms,
+    updateCategoryAndTags,
+    searchBusinessCards,
+    editConnectionNotes
 };

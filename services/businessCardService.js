@@ -121,6 +121,17 @@ const getCardsSharedByUser = async (userId) => {
     }
 };
 
+const getCardsBySearch = async (searchCriteria) => {
+    return await ConnectionModel.find(searchCriteria);
+};
+
+const updateCardCategoryAndTags = async (connectionId, category, tags) => {
+    return await ConnectionModel.findByIdAndUpdate(connectionId, { category, tags }, { new: true });
+};
+
+const updateConnectionNotes = async (connectionId, notes) => {
+    return await ConnectionModel.findByIdAndUpdate(connectionId, { notes }, { new: true });
+};
 
 export {
     createBusinessCard,
@@ -130,5 +141,8 @@ export {
     listBusinessCardsByUser,
     shareBusinessCardWithUser,
     getSharedBusinessCards,
-    getCardsSharedByUser
+    getCardsSharedByUser,
+    updateCardCategoryAndTags,
+    getCardsBySearch,
+    updateConnectionNotes
 };

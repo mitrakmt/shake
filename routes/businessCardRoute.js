@@ -57,7 +57,10 @@ router
         trimRequest.all,
         isActiveUser,
         controller.fetchSharedCardsByCurrentUser
-    );
+);
+    
+    router.get('/search', isActiveUser, controller.searchBusinessCards);
+    router.put('/connections/:connectionId/notes', isActiveUser, controller.editConnectionNotes);
 
     router
     .route('/:cardId')
@@ -76,5 +79,8 @@ router
             isActiveUser,
             controller.deleteCard 
     );
+
+    router.put('/:connectionId/category-tags', isActiveUser, controller.updateCategoryAndTags);
+
 
 export default router;

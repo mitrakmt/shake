@@ -4,7 +4,7 @@ import { logInteraction, fetchInteractions } from '../controllers/analyticsContr
 
 const router = express.Router();
 
-router.post('/interactions', isActiveUser, logInteraction);
-router.get('/interactions/:cardId', isActiveUser, fetchInteractions);
+router.post('/', isActiveUser, logInteraction);
+router.get('/:cardId', isActiveUser, fetchInteractions);
 
 export default router;
