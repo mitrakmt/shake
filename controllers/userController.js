@@ -1,6 +1,6 @@
 import { sendPasswordResetEmail } from '../utils/emailFunctions.js';
 import {
-  getUserFromId, updateUserById, getPublicUserById
+  getUserFromId, updateUserById, getPublicUserById, getUsersInRadius, updateLocation
 } from '../services/userService.js';
   
 const getUserInfo = async (req, res, next) => {
@@ -54,10 +54,39 @@ const requestPasswordReset = async (req, res, next) => {
         next(error);
     }
 };
+
+const setLocation = async (req, res) => {
+    const { userId } = req.authData; // Assuming you have the user's ID from auth middleware
+    const { lat, lng } = req.body;
+
+    try {
+        await updateLocation(userId, lat, lng);
+        res.status(200).json({ message: 'Location updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating location', error });
+    }
+};
+
+const getPublicUserLocations = async (req, res) => {
+    const { latitude, longitude, radius = 50 } = req.query; // Default radius is 50 miles
+
+    if (!latitude || !longitude) {
+        return res.status(400).json({ message: 'Latitude and longitude are required.' });
+    }
+
+    try {
+        const locations = await getUsersInRadius(parseFloat(latitude), parseFloat(longitude), parseFloat(radius));
+        res.status(200).json({ locations });
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving locations', error });
+    }
+};
  
 export default { 
     getUserInfo,
     updateUserInfo,
     getPublicUser,
-    requestPasswordReset
+    requestPasswordReset,
+    setLocation,
+    getPublicUserLocations,
 }

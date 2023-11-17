@@ -17,9 +17,30 @@ const userSchema = new mongoose.Schema({
     country: { type: String, default: null },
     city: { type: String, default: null },
     gender: { type: String, default: null },
-    lastLogin: { type: Date, default: Date.now() },
+    lastLogin: { type: Date, default: Date },
     accountStatus: { type: String, default: "active" },
-},{collection : "users"})
+    location: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            required: false
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            required: false
+        },
+        timestamp: Date
+    }
+}, {
+    collection: "users",
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+})
+
+userSchema.set('location', { default: null });
+
+userSchema.index({ 'location.coordinates': '2dsphere' });
 
 const UserModel = mongoose.model('UserSchema', userSchema)
 

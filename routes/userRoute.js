@@ -22,9 +22,26 @@ const router = express.Router();
   );
 
 router
+  .route('/location')
+  .post(
+    trimRequest.all,
+    isActiveUser,
+    controller.setLocation
+)
+
+router
+  .route('/nearby')
+  .get(
+    trimRequest.all,
+    isActiveUser,
+    controller.getPublicUserLocations
+  )
+
+router
   .route('/:userId')
   .get(
     trimRequest.all,
+    isActiveUser,
     controller.getPublicUser
   )
 
