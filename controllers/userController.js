@@ -9,6 +9,10 @@ import {
 const getUserInfo = async (req, res, next) => {
     const userId = req.authData.userId
     try {
+        if (!userId) {
+            res.status(400).json({ message: 'No valid token provided' });
+
+        }
         const user = await getUserFromId(userId)
 
         res.json({ user });
