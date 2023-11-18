@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const businessCardSchema = new Schema({
-    userId: { type: Schema.Types.ObjectId, ref: 'UserSchema' },
+    user: { type: Schema.Types.ObjectId, ref: 'UserSchema' },
     title: { type: String, default: null },
     company: { type: String, default: null },
     email: { type: String, default: null },

@@ -3,16 +3,35 @@
   import httpStatus from 'http-status';
   
   import APIError from '../utils/ApiError.js';
-  import bcrypt from 'bcryptjs';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+
+import { sendAccountVerificationEmail } from '../utils/emailFunctions.js';
   
   const createNewUser = async(user)=>{
-    const oldUser =await UserModel.findOne({ email:user.email.toLowerCase() });
+    const oldUser =await UserModel.findOne({ email: user.email.toLowerCase() });
     if(oldUser)
       throw new APIError(httpStatus.BAD_REQUEST, "Email already exists.")
     
     const newUser = await UserModel.create(user);
     if(!newUser)
-      throw new APIError(httpStatus.BAD_REQUEST,"Oops...seems our server needed a break!")
+      throw new APIError(httpStatus.BAD_REQUEST, "Oops...seems our server needed a break!")
+    
+    // Generate a verification token
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+
+    // Set the email verification token and its expiration
+    newUser.emailVerificationToken = verificationToken;
+    newUser.emailVerificationExpires = Date.now() + 3600000; // Token expires in 1 hour
+
+    // Save the user
+    await newUser.save();
+    
+
+    // Send verification email
+    await sendAccountVerificationEmail(user.email, verificationToken);
+    
+    
     return newUser;
   }
 

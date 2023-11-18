@@ -1,6 +1,9 @@
 import { sendPasswordResetEmail } from '../utils/emailFunctions.js';
+import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
+
 import {
-  getUserFromId, updateUserById, getPublicUserById, getUsersInRadius, updateLocation
+  getUserFromId, updateUserById, getPublicUserById, getUsersInRadius, updateLocation, getUserFromEmail, saveResetPasswordToken, verifyEmail, doResetPasswordWithToken
 } from '../services/userService.js';
   
 const getUserInfo = async (req, res, next) => {
@@ -44,11 +47,27 @@ const updateUserInfo = async (req, res, next) => {
 
 const requestPasswordReset = async (req, res, next) => {
     const userEmail = req.body.email;
+
     // Generate a password reset token
-    const resetToken = 'generatedToken'; // Implement token generation logic
+    const resetToken = crypto.randomBytes(20).toString('hex');
 
     try {
+        // Hash the token
+        const hashedToken = await bcrypt.hash(resetToken, 10);
+
+        // Find the user by their email
+        const user = await getUserFromEmail(userEmail)
+
+        if (!user) {
+            return res.status(400).json({ message: 'No user found' });
+        }
+
+        // Save the hashed token and its expiration to the user's record
+        await saveResetPasswordToken(userEmail, hashedToken);
+
+        // Send password reset email
         await sendPasswordResetEmail(userEmail, resetToken);
+
         res.status(200).json({ message: 'Password reset email sent.' });
     } catch (error) {
         next(error);
@@ -81,6 +100,33 @@ const getPublicUserLocations = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving locations', error });
     }
 };
+
+const verifyUserEmail = async (req, res) => {
+    try {
+        const { token } = req.params;
+        await verifyEmail(token);
+        res.status(200).json({ message: 'Email successfully verified' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
+
+const resetPasswordWithToken = async (req, res) => {
+    try {
+        const { token } = req.query;
+        const { newPassword } = req.body;
+
+        if (!token) {
+            return res.status(400).json({ message: 'Token is required' });
+        }
+
+        await doResetPasswordWithToken(token, newPassword);
+
+        res.status(200).json({ message: 'Password has been reset successfully' });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+};
  
 export default { 
     getUserInfo,
@@ -89,4 +135,6 @@ export default {
     requestPasswordReset,
     setLocation,
     getPublicUserLocations,
+    verifyUserEmail,
+    resetPasswordWithToken
 }

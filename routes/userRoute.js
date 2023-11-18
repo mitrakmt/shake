@@ -29,6 +29,17 @@ router
     controller.setLocation
 )
 
+router.get('/verify/:token', controller.verifyUserEmail);
+
+router
+  .route('/reset-password-request')
+  .post(
+    trimRequest.all,
+    controller.requestPasswordReset
+);
+  
+router.post('/reset-password', controller.resetPasswordWithToken);
+
 router
   .route('/nearby')
   .get(

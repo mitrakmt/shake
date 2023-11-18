@@ -1,5 +1,6 @@
 import {UserModel} from '../models/index.js'
 import ApiError from '../utils/ApiError.js';
+import bcrypt from 'bcryptjs';
 
 const updateUserById = async (userId, updateData) => {
     try {
@@ -68,13 +69,88 @@ const getUsersInRadius = async (latitude, longitude, radiusInMiles) => {
                 $maxDistance: radiusInMeters
             }
         }
-    }).select('-password -verified -premium -source -email -lastLogin -accountStatus');
+    }).select('-password -isVerified -premium -source -email -lastLogin -accountStatus');
 };
+
+const saveResetPasswordToken = async (email, hashedToken) => {
+    try {
+        // Find the user by their email
+        const user = await UserModel.findOne({ email: email });
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        // Set the reset token and expiration
+        user.resetPasswordToken = hashedToken;
+        user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
+
+        // Save the user with the updated fields
+        await user.save();
+
+        return user;
+    } catch (error) {
+        throw error;
+    }
+};
+
+const doResetPasswordWithToken = async (token, newPassword) => {
+    const user = await UserModel.findOne({
+        resetPasswordToken: token,
+        resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+        throw new Error('Password reset token is invalid or has expired.');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
+    await user.save();
+
+    return user;
+};
+
+const getUserFromEmail = async (email) => {
+    try {
+        const user = await UserModel.findOne({ email: email });
+        return user;
+    } catch (error) {
+        console.error('Error fetching user by email:', error);
+        throw error;
+    }
+};
+
+const verifyEmail = async (token) => {
+    const user = await UserModel.findOne({
+        emailVerificationToken: token,
+        emailVerificationExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+        throw new Error('Invalid or expired token');
+    }
+
+    user.isVerified = true;
+    user.emailVerificationToken = null;
+    user.emailVerificationExpires = null;
+
+    await user.save();
+
+    return user;
+};
+
 
 export {
     getUserFromId,
     updateUserById,
     getPublicUserById,
     updateLocation,
-    getUsersInRadius
+    getUsersInRadius,
+    saveResetPasswordToken,
+    getUserFromEmail,
+    verifyEmail,
+    doResetPasswordWithToken
 }

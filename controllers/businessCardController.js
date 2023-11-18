@@ -101,11 +101,12 @@ const shareBusinessCardByEmail = async (req, res, next) => {
         const businessCard = await getBusinessCardById(cardId);
 
         // Optional: Check if the business card belongs to the current user
-        if (businessCard.userId.toString() !== userId) {
+        if (businessCard.user._id.toString() !== userId) {
             return res.status(403).json({ message: 'You can only share your own business cards.' });
         }
 
-        await sendBusinessCardEmail(req.authData, recipientEmail, businessCard);
+
+        await sendBusinessCardEmail(businessCard.user, recipientEmail, businessCard);
         res.status(200).json({ message: 'Business card shared successfully.' });
     } catch (error) {
         next(error);

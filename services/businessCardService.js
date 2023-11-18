@@ -31,7 +31,7 @@ const generateQRCode = async (text) => {
 
 const getBusinessCardById = async (cardId) => {
     try {
-        const businessCard = await BusinessCardModel.findById(cardId);
+        const businessCard = await BusinessCardModel.findById(cardId).populate('user');
         if (!businessCard) {
             throw new ApiError('Business card not found');
         }
@@ -70,7 +70,7 @@ const deleteBusinessCardById = async (cardId) => {
 
 const listBusinessCardsByUser = async (userId) => {
     try {
-        const businessCards = await BusinessCardModel.find({ userId: userId });
+        const businessCards = await BusinessCardModel.find({ user: userId });
         return businessCards;
     } catch (error) {
         console.error('Error listing business cards:', error);

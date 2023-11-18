@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    username : {type : String, required: true },
+    username : {type : String, required: true, unique: true },
     name : { type : String, default: null },
     profilePhoto : { type : String, default: null },
-    verified: { type: Boolean, default: false },
+    isVerified: { type: Boolean, default: false },
     premium: { type: Boolean, default: false },
     email : {type : String, required : true,},
     password : {type : String, required: true},
@@ -30,7 +30,23 @@ const userSchema = new mongoose.Schema({
             required: false
         },
         timestamp: Date
-    }
+    },
+    resetPasswordToken: {
+        type: String,
+        default: null
+    },
+    resetPasswordExpires: {
+        type: Date,
+        default: null
+    },
+    emailVerificationToken: {
+        type: String,
+        default: null
+    },
+    emailVerificationExpires: {
+        type: Date,
+        default: null
+    },
 }, {
     collection: "users",
     timestamps: true,

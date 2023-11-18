@@ -12,12 +12,12 @@ import {
     clearRefreshToken,
     verifyRefreshToken,
     generateAccessTokenFromRefreshTokenPayload,
-  } from '../services/tokenService.js';
+} from '../services/tokenService.js';
 import { OAuth2Client } from 'google-auth-library';
 
-   
   const register = async (req, res, next) => {
-    const {email, password, username} = req.body
+    const { email, password, username } = req.body;
+
     try {
     const hashedPassword = await bcryptjs.hash(password, 10);
     const newUser = await createNewUser({
@@ -26,8 +26,9 @@ import { OAuth2Client } from 'google-auth-library';
       source: "email",
       username : username
     });
-    const tokens = await generateAuthTokens(newUser)
-    res.json({user : newUser,tokens});
+      const tokens = await generateAuthTokens(newUser)
+
+    res.json({ user: newUser, tokens });
     } catch (error) {
       next(error);
     }
@@ -118,5 +119,5 @@ import { OAuth2Client } from 'google-auth-library';
   }
 
 export default { 
-  login, logout, refreshToken,  resetPassword, register, googleUserRegister, googleUserLogin
+  login, logout, refreshToken, resetPassword, register, googleUserRegister, googleUserLogin
 }
