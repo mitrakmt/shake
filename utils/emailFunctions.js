@@ -8,7 +8,7 @@ const postmarkClient = new ServerClient(process.env.POSTMARK_API_KEY);
 const sendEmail = async (to, subject, text, html) => {
     const message = {
         "From": "hello@getshake.io",
-        "To": "hello@getshake.io",
+        "To": to,
         "Subject": subject,
         "TextBody": text,
         "HtmlBody": html,
@@ -37,11 +37,11 @@ const sendAccountVerificationEmail = async (userEmail, verificationToken) => {
 const sendBusinessCardEmail = async (fromUser, toEmail, businessCard) => {
     const subject = `${fromUser.name} has shared a business card with you!`;
 
-    let htmlContent = generateHtmlContent(businessCard, fromUser)
+    let htmlContent = generateHtmlContentForBusinessCardEmail(businessCard, fromUser)
     await sendEmail(toEmail, subject, '', htmlContent);
 };
 
-const generateHtmlContent = (businessCard, fromUser) => {
+const generateHtmlContentForBusinessCardEmail = (businessCard, fromUser) => {
     let htmlContent = `
         <div style="font-family: Arial, sans-serif; color: #333;">
             <h2 style="color: #4A90E2;">${fromUser.name}'s Business Card</h2>
