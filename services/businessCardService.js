@@ -122,7 +122,7 @@ const getCardsSharedByUser = async (userId) => {
 };
 
 const getCardsBySearch = async (searchCriteria) => {
-    return await ConnectionModel.find(searchCriteria);
+    return await ConnectionModel.find(searchCriteria).populate('businessCard');
 };
 
 const updateCardCategoryAndTags = async (connectionId, category, tags) => {
