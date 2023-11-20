@@ -9,7 +9,6 @@ import { verify } from '../utils/jwtHelpers.js';
 
 const isActiveUser = async (req, res, next) => {
   try {
-
     const accessToken = req.get('Authorization').split(' ')[1];
 
     if (!accessToken)
